@@ -1,6 +1,7 @@
-import { Button, Toggle, Slider, ErrorMessage } from "../ui";
 import { useState } from "react";
+import Sidebar from "../sidebar/Sidebar";
 import type { Theme } from "../../types";
+import styles from "./AppLayout.module.css";
 
 interface AppLayoutProps {
   theme: Theme;
@@ -8,17 +9,30 @@ interface AppLayoutProps {
 }
 
 const AppLayout = ({ theme, onToggleTheme }: AppLayoutProps) => {
-  const [sliderVal, setSliderVal] = useState(1.0);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
-      <Button variant="primary">Primary</Button>
-      <Button variant="ghost">Ghost</Button>
-      <Button variant="danger">Danger</Button>
-      <Button variant="primary" disabled>Disabled</Button>
-      <Toggle checked={theme === "dark"} onChange={onToggleTheme} label="Тёмная тема" />
-      <Slider min={0} max={2} step={0.1} value={sliderVal} onChange={setSliderVal} label="Temperature" />
-      <ErrorMessage message="Что-то пошло не так" />
+    <div className={styles.layout}>
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+      <div className={styles.main}>
+        {/* Шапка (мобильная) */}
+        <header className={styles.topbar}>
+          <button
+            className={styles.burgerBtn}
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Открыть меню"
+          >
+            ☰
+          </button>
+          <span className={styles.topbarTitle}>GigaChat UI</span>
+        </header>
+
+        {/* Заглушка — сюда придёт ChatWindow */}
+        <div className={styles.placeholder}>
+          <p>ChatWindow — TODO</p>
+        </div>
+      </div>
     </div>
   );
 };

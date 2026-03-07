@@ -1,0 +1,118 @@
+.sidebar {
+  width: var(--sidebar-width);
+  height: 100%;
+  background-color: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 8px;
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+
+/* ── Заголовок ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 6px 8px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.brand {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.closeBtn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.closeBtn:hover {
+  background-color: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+/* ── Новый чат ── */
+.newChat {
+  padding: 4px 2px;
+}
+
+.newChatBtn {
+  width: 100%;
+  justify-content: center;
+}
+
+/* ── Поиск ── */
+.search {
+  padding: 0 2px;
+}
+
+/* ── Список ── */
+.chatListWrapper {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chatListWrapper::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chatListWrapper::-webkit-scrollbar-thumb {
+  background-color: var(--color-border);
+  border-radius: 4px;
+}
+
+.sectionLabel {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  padding: 4px 10px 2px;
+}
+
+/* ── Адаптив (мобильные) ── */
+.overlay {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100dvh;
+    z-index: 100;
+    transform: translateX(-100%);
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 99;
+  }
+
+  .closeBtn {
+    display: flex;
+  }
+}
