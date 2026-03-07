@@ -37,3 +37,15 @@ export const IconCheck = ({ size = 16 }: IconProps) => (
 export const IconChat = ({ size = 16 }: IconProps) => (
   <span style={{ fontSize: size, lineHeight: 1 }}>💬</span>
 );
+
+export const IconSend = ({ size = 16 }: IconProps) => (
+  <span style={{ fontSize: size, lineHeight: 1 }}>➤</span>
+);
+
+export const IconStop = ({ size = 16 }: IconProps) => (
+  <span style={{ fontSize: size, lineHeight: 1 }}>⏹</span>
+);
+
+export const IconPaperclip = ({ size = 16 }: IconProps) => (
+  <span style={{ fontSize: size, lineHeight: 1 }}>📎</span>
+);

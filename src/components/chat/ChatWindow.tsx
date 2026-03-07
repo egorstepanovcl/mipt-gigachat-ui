@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { IconSettings } from "../ui/Icon";
 import MessageList from "./MessageList";
+import { InputArea } from "./InputArea";
 import { MOCK_MESSAGES } from "../../mocks/messages";
 import type { Message } from "../../types";
 import styles from "./ChatWindow.module.css";
@@ -14,8 +15,18 @@ const ChatWindow = ({
   chatTitle = "Как работает React Suspense?",
   onOpenSettings,
 }: ChatWindowProps) => {
-  const [messages] = useState<Message[]>(MOCK_MESSAGES);
+  const [messages, setMessages] = useState<Message[]>(MOCK_MESSAGES);
   const [isTyping] = useState(true);
+
+  const handleSubmit = (text: string) => {
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      role: "user",
+      content: text,
+      timestamp: new Date().toISOString(),
+    };
+    setMessages((prev) => [...prev, newMessage]);
+  };
 
   return (
     <div className={styles.window}>
@@ -37,8 +48,8 @@ const ChatWindow = ({
 
       <MessageList messages={messages} isTyping={isTyping} />
 
-      <div className={styles.inputPlaceholder}>
-        <span>InputArea — TODO</span>
+      <div className={styles.inputWrapper}>
+        <InputArea onSubmit={handleSubmit} />
       </div>
     </div>
   );
