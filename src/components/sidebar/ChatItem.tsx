@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { IconChat, IconPencil, IconTrash } from "../ui/Icon";
 import type { Chat } from "../../types";
 import styles from "./ChatItem.module.css";
 
@@ -47,16 +48,8 @@ const ChatItem = ({ chat, isActive, onSelect, onEdit, onDelete }: ChatItemProps)
       onKeyDown={(e) => e.key === "Enter" && onSelect(chat.id)}
     >
       {/* Иконка чата */}
-      <svg className={styles.chatIcon} viewBox="0 0 20 20" fill="none">
-        <path
-          d="M2 5a2 2 0 012-2h12a2 2 0 012 2v7a2 2 0 01-2 2H7l-4 3V5z"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinejoin="round"
-        />
-      </svg>
+      <IconChat size={16} />
 
-      {/* Текст */}
       <div className={styles.content}>
         <span className={styles.title}>{chat.title}</span>
         <span className={styles.date}>{formatDate(chat.updatedAt)}</span>
@@ -71,14 +64,7 @@ const ChatItem = ({ chat, isActive, onSelect, onEdit, onDelete }: ChatItemProps)
             aria-label="Переименовать"
             title="Переименовать"
           >
-            <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
-              <path
-                d="M11.5 2.5l2 2-8 8H3.5v-2l8-8z"
-                stroke="currentColor"
-                strokeWidth="1.3"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <IconPencil size={14} />
           </button>
           <button
             className={`${styles.actionBtn} ${styles.deleteBtn}`}
@@ -86,15 +72,7 @@ const ChatItem = ({ chat, isActive, onSelect, onEdit, onDelete }: ChatItemProps)
             aria-label="Удалить"
             title="Удалить"
           >
-            <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
-              <path
-                d="M3 4h10M6 4V2.5h4V4M5 4v8h6V4"
-                stroke="currentColor"
-                strokeWidth="1.3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <IconTrash size={14} />
           </button>
         </div>
       )}

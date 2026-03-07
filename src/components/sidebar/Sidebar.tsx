@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { IconPlus, IconClose } from "../ui/Icon";
 import { Button } from "../ui";
 import SearchInput from "./SearchInput";
 import ChatList from "./ChatList";
@@ -61,16 +62,14 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         <div className={styles.header}>
           <span className={styles.brand}>✦ GigaChat</span>
           <button className={styles.closeBtn} onClick={onClose} aria-label="Закрыть">
-            ✕
+            <IconClose size={16} />
           </button>
         </div>
 
         {/* Новый чат */}
         <div className={styles.newChat}>
           <Button variant="primary" onClick={handleNewChat} className={styles.newChatBtn}>
-            <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
-              <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
+            <IconPlus size={14} />
             Новый чат
           </Button>
         </div>

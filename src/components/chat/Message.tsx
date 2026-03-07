@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { IconCopy, IconCheck } from "../ui/Icon";
 import ReactMarkdown from "react-markdown";
 import type { MessageRole } from "../../types";
 import styles from "./Message.module.css";
@@ -16,18 +17,10 @@ const formatTime = (timestamp: number) =>
     minute: "2-digit",
   });
 
-// Иконка GigaChat для ассистента
+  // Иконка GigaChat для ассистента
 const AssistantAvatar = () => (
   <div className={styles.avatar} aria-label="GigaChat">
-    <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
-      <circle cx="12" cy="12" r="10" fill="var(--color-primary)" />
-      <path
-        d="M8 12h8M12 8v8"
-        stroke="#fff"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
+    <span className={styles.avatarIcon}>✦</span>
   </div>
 );
 
@@ -91,32 +84,21 @@ const Message = ({ variant, content, sender, timestamp }: MessageProps) => {
 
         {/* Футер: время + кнопка копирования */}
         <div className={styles.footer}>
-        {timestamp && (
+          {timestamp && (
             <span className={styles.time}>{formatTime(timestamp)}</span>
-        )}
-        <button
+          )}
+          <button
             className={`${styles.copyBtn} ${copied ? styles.copyBtnSuccess : ""} ${isHovered ? styles.copyBtnVisible : ""}`}
             onClick={handleCopy}
             aria-label="Копировать"
             title="Копировать"
-        >
+          >
             {copied ? (
-            <>
-                <svg viewBox="0 0 16 16" fill="none" width="13" height="13">
-                <path d="M3 8l3.5 3.5L13 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                Скопировано
-            </>
+              <><IconCheck size={13} /> Скопировано</>
             ) : (
-            <>
-                <svg viewBox="0 0 16 16" fill="none" width="13" height="13">
-                <rect x="5" y="5" width="8" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.3" />
-                <path d="M11 5V3.5A1.5 1.5 0 009.5 2h-6A1.5 1.5 0 002 3.5v7A1.5 1.5 0 003.5 12H5" stroke="currentColor" strokeWidth="1.3" />
-                </svg>
-                Копировать
-            </>
+              <><IconCopy size={13} /> Копировать</>
             )}
-        </button>
+          </button>
         </div>
       </div>
     </div>

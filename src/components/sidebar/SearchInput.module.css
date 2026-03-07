@@ -2,16 +2,21 @@
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .icon {
+  margin-top: -5px;
   position: absolute;
   left: 10px;
-  width: 15px;
-  height: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
   color: var(--color-text-muted);
   pointer-events: none;
-  flex-shrink: 0;
 }
 
 .input {
@@ -37,12 +42,16 @@
 .clear {
   position: absolute;
   right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
   color: var(--color-text-muted);
-  font-size: 11px;
-  padding: 2px 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
   border-radius: 3px;
   line-height: 1;
 }
