@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Sidebar from "../sidebar/Sidebar";
 import ChatWindow from "../chat/ChatWindow";
+import { SettingsPanel } from "../settings/SettingsPanel";
 import type { Theme } from "../../types";
 import styles from "./AppLayout.module.css";
 
@@ -11,6 +12,7 @@ interface AppLayoutProps {
 
 const AppLayout = ({ theme, onToggleTheme }: AppLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
     <div className={styles.layout}>
@@ -29,8 +31,15 @@ const AppLayout = ({ theme, onToggleTheme }: AppLayoutProps) => {
           <span className={styles.topbarTitle}>GigaChat UI</span>
         </header>
 
-        <ChatWindow onOpenSettings={() => alert("SettingsPanel — TODO")} />
+        <ChatWindow onOpenSettings={() => setSettingsOpen(true)} />
       </div>
+
+      <SettingsPanel
+        isOpen={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        theme={theme}
+        onToggleTheme={onToggleTheme}
+      />
     </div>
   );
 };
