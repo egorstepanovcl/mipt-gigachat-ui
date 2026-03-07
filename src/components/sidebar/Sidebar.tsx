@@ -10,11 +10,12 @@ import styles from "./Sidebar.module.css";
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  activeId: string | null;
+  onSelectChat: (id: string) => void;
 }
 
-const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
+const Sidebar = ({ isOpen, onClose, activeId, onSelectChat }: SidebarProps) => {
   const [chats, setChats] = useState<Chat[]>(MOCK_CHATS);
-  const [activeChatId, setActiveChatId] = useState<string | null>(MOCK_CHATS[0].id);
   const [search, setSearch] = useState("");
 
   const filtered = chats.filter((c) =>
@@ -30,7 +31,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
       updatedAt: Date.now(),
     };
     setChats((prev) => [newChat, ...prev]);
-    setActiveChatId(newChat.id);
+    onSelectChat(newChat.id);
   };
 
   const handleEdit = (id: string) => {
@@ -46,52 +47,43 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     const confirmed = window.confirm("Удалить этот чат?");
     if (confirmed) {
       setChats((prev) => prev.filter((c) => c.id !== id));
-      if (activeChatId === id) {
-        setActiveChatId(chats.find((c) => c.id !== id)?.id ?? null);
+      if (activeId === id) {
+        onSelectChat(chats.find((c) => c.id !== id)?.id ?? "");
       }
     }
   };
 
   return (
-    <>
-      {/* Оверлей для мобильных */}
-      {isOpen && <div className={styles.overlay} onClick={onClose} />}
+    <aside className={styles.sidebar}>
+      <div className={styles.header}>
+        <span className={styles.brand}>✦ GigaChat</span>
+        <button className={styles.closeBtn} onClick={onClose} aria-label="Закрыть">
+          <IconClose size={16} />
+        </button>
+      </div>
 
-      <aside className={`${styles.sidebar} ${isOpen ? styles.open : ""}`}>
-        {/* Заголовок */}
-        <div className={styles.header}>
-          <span className={styles.brand}>✦ GigaChat</span>
-          <button className={styles.closeBtn} onClick={onClose} aria-label="Закрыть">
-            <IconClose size={16} />
-          </button>
-        </div>
+      <div className={styles.newChat}>
+        <Button variant="primary" onClick={handleNewChat} className={styles.newChatBtn}>
+          <IconPlus size={14} />
+          Новый чат
+        </Button>
+      </div>
 
-        {/* Новый чат */}
-        <div className={styles.newChat}>
-          <Button variant="primary" onClick={handleNewChat} className={styles.newChatBtn}>
-            <IconPlus size={14} />
-            Новый чат
-          </Button>
-        </div>
+      <div className={styles.search}>
+        <SearchInput value={search} onChange={setSearch} />
+      </div>
 
-        {/* Поиск */}
-        <div className={styles.search}>
-          <SearchInput value={search} onChange={setSearch} />
-        </div>
-
-        {/* Список чатов */}
-        <div className={styles.chatListWrapper}>
-          <p className={styles.sectionLabel}>Последние чаты</p>
-          <ChatList
-            chats={filtered}
-            activeChatId={activeChatId}
-            onSelect={setActiveChatId}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-        </div>
-      </aside>
-    </>
+      <div className={styles.chatListWrapper}>
+        <p className={styles.sectionLabel}>Последние чаты</p>
+        <ChatList
+          chats={filtered}
+          activeChatId={activeId}
+          onSelect={onSelectChat}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      </div>
+    </aside>
   );
 };
 
