@@ -1,6 +1,15 @@
+.outer {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .wrapper {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 8px;
   padding: 10px 14px;
   border: 1px solid var(--color-border);
@@ -9,9 +18,31 @@
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+.attach,
+.stop,
+.send {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease, opacity 0.15s ease;
+  margin-bottom: 2px;
+}
+
 .wrapper:focus-within {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
+}
+
+.dragging .wrapper {
+  border-color: var(--color-primary);
+  border-style: dashed;
+  background-color: color-mix(in srgb, var(--color-primary) 5%, transparent);
 }
 
 .textarea {
@@ -24,12 +55,33 @@
   font-size: 14px;
   line-height: 1.5;
   padding: 2px 0;
-  max-height: calc(1.5em * 5);
+  max-height: 40vh;
   overflow-y: auto;
+  font-family: inherit;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+  align-self: center;
 }
 
 .textarea::placeholder {
   color: var(--color-text-muted);
+}
+
+.textarea::-webkit-scrollbar {
+  width: 4px;
+}
+
+.textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.textarea::-webkit-scrollbar-thumb {
+  background-color: var(--color-border);
+  border-radius: 4px;
+}
+
+.textarea::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-text-muted);
 }
 
 .attach,
@@ -67,7 +119,6 @@
 .send {
   background-color: var(--color-primary);
   color: #fff;
-  border-radius: 10px;
 }
 
 .send:disabled {
@@ -77,4 +128,15 @@
 
 .send:not(:disabled):hover {
   background-color: var(--color-primary-hover);
+}
+
+.counter {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.counterWarn {
+  color: #f59e0b;
 }
