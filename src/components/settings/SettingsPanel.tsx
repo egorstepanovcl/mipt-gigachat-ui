@@ -34,11 +34,9 @@ export const SettingsPanel = ({
   theme,
   onToggleTheme,
 }: SettingsPanelProps) => {
-  const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [draft, setDraft] = useState<Settings>(DEFAULT_SETTINGS);
 
   const handleSave = () => {
-    setSettings(draft);
     onClose();
   };
 

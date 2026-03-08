@@ -14,7 +14,7 @@ interface SidebarProps {
   onSelectChat: (id: string) => void;
 }
 
-const Sidebar = ({ isOpen, onClose, activeId, onSelectChat }: SidebarProps) => {
+const Sidebar = ({ isOpen: _isOpen, onClose, activeId, onSelectChat }: SidebarProps) => {
   const [chats, setChats] = useState<Chat[]>(MOCK_CHATS);
   const [search, setSearch] = useState("");
 

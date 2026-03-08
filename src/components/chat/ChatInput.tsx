@@ -1,4 +1,5 @@
-import { useRef, useState, useEffect, KeyboardEvent, DragEvent } from "react";
+import { useRef, useState, useEffect } from "react";
+import type { KeyboardEvent, DragEvent } from "react";
 import { IconSend, IconStop, IconPaperclip } from "../ui/Icon";
 import styles from "./ChatInput.module.css";
 

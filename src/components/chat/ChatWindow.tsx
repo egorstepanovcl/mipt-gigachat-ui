@@ -16,7 +16,7 @@ const ChatWindow = ({
   onOpenSettings,
 }: ChatWindowProps) => {
   const [messages, setMessages] = useState<Message[]>(MOCK_MESSAGES);
-  const [isTyping, setIsTyping] = useState(false);
+  const [isTyping] = useState(false);
   const [inputValue, setInputValue] = useState("");
 
   const handleSend = (text: string) => {
@@ -24,7 +24,7 @@ const ChatWindow = ({
       id: Date.now().toString(),
       role: "user",
       content: text,
-      timestamp: new Date().toISOString(),
+      timestamp: Date.now(),
     };
     setMessages((prev) => [...prev, newMessage]);
   };
