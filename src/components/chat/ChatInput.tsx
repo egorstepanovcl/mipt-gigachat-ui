@@ -7,6 +7,7 @@ type ChatInputProps = {
   value: string;
   onChange: (value: string) => void;
   onSend: (message: string) => void;
+  onStop?: () => void;
   disabled?: boolean;
   placeholder?: string;
   maxRows?: number;
@@ -19,6 +20,7 @@ export const ChatInput = ({
   value,
   onChange,
   onSend,
+  onStop,
   disabled = false,
   placeholder = "Напишите сообщение...",
   maxRows = 8,
@@ -132,7 +134,8 @@ export const ChatInput = ({
         <button
           className={styles.stop}
           type="button"
-          disabled
+          onClick={onStop}
+          disabled={!disabled}
           title="Стоп"
           tabIndex={-1}
         >

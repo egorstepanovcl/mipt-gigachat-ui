@@ -1,9 +1,7 @@
-import { useState } from "react";
 import { IconSettings } from "../ui/Icon";
 import MessageList from "./MessageList";
 import { ChatInput } from "./ChatInput";
-import { MOCK_MESSAGES } from "../../mocks/messages";
-import type { Message } from "../../types";
+import { useChat } from "../../hooks/useChat";
 import styles from "./ChatWindow.module.css";
 
 interface ChatWindowProps {
@@ -15,19 +13,9 @@ const ChatWindow = ({
   chatTitle = "Как работает React Suspense?",
   onOpenSettings,
 }: ChatWindowProps) => {
-  const [messages, setMessages] = useState<Message[]>(MOCK_MESSAGES);
-  const [isTyping] = useState(false);
-  const [inputValue, setInputValue] = useState("");
-
-  const handleSend = (text: string) => {
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      role: "user",
-      content: text,
-      timestamp: Date.now(),
-    };
-    setMessages((prev) => [...prev, newMessage]);
-  };
+  const { messages, input, setInput, sendMessage, isLoading, stop } = useChat({
+    api: "/api/chat",
+  });
 
   return (
     <div className={styles.window}>
@@ -47,16 +35,17 @@ const ChatWindow = ({
         </div>
       </header>
 
-      <MessageList messages={messages} isTyping={isTyping} />
+      <MessageList messages={messages} isTyping={isLoading} />
 
       <div className={styles.inputWrapper}>
         <ChatInput
-          value={inputValue}
-          onChange={setInputValue}
-          onSend={handleSend}
-          disabled={isTyping}
+          value={input}
+          onChange={setInput}
+          onSend={sendMessage}
+          onStop={stop}
+          disabled={isLoading}
           maxLength={4000}
-          onTyping={() => console.log("typing...")}
+          onTyping={() => {}}
           onFilesDrop={(files) => console.log("files:", files)}
         />
       </div>

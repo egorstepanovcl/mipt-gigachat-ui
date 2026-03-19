@@ -112,8 +112,19 @@
 .stop {
   background: none;
   color: var(--color-text-muted);
+}
+
+.stop:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+.stop:not(:disabled) {
+  color: var(--color-text);
+}
+
+.stop:not(:disabled):hover {
+  background-color: var(--color-surface-hover);
 }
 
 .send {
