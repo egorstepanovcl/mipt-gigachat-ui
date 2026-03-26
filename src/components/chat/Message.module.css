@@ -109,19 +109,19 @@
 
 /* ── Код ── */
 .codeBlock {
-  background-color: #1e1e2e;
-  color: #cdd6f4;
-  border-radius: var(--radius-sm);
-  padding: 12px 14px;
+  background-color: var(--color-code-bg) !important;
+  color: var(--color-code-text);
+  border-radius: var(--radius-sm) !important;
+  padding: 12px 14px !important;
   overflow-x: auto;
-  margin: 8px 0;
-  font-size: 13px;
-  line-height: 1.6;
+  margin: 8px 0 !important;
+  font-size: 13px !important;
+  line-height: 1.6 !important;
 }
 
-.codeInner {
-  font-family: "Fira Code", "Cascadia Code", Consolas, monospace;
-  white-space: pre;
+.codeBlock code {
+  font-family: "Fira Code", "Cascadia Code", Consolas, monospace !important;
+  background: none !important;
 }
 
 .codeInline {

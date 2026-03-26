@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { IconCopy, IconCheck } from "../ui/Icon";
 import ReactMarkdown from "react-markdown";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneLight, oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import type { MessageRole } from "../../types";
 import styles from "./Message.module.css";
 
@@ -27,6 +29,7 @@ const AssistantAvatar = () => (
 const Message = ({ variant, content, sender, timestamp }: MessageProps) => {
   const [copied, setCopied] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const isDark = document.documentElement.getAttribute("data-theme") === "dark";
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(content);
@@ -53,15 +56,19 @@ const Message = ({ variant, content, sender, timestamp }: MessageProps) => {
         <div className={styles.content}>
           <ReactMarkdown
             components={{
-              // Блок кода
+              // Блок кода с подсветкой синтаксиса
               code({ className, children, ...props }) {
-                const isBlock = className?.includes("language-");
-                return isBlock ? (
-                  <pre className={styles.codeBlock}>
-                    <code className={styles.codeInner} {...props}>
-                      {children}
-                    </code>
-                  </pre>
+                const match = className?.match(/language-(\w+)/);
+                return match ? (
+                  <SyntaxHighlighter
+                    style={isDark ? oneDark : oneLight}
+                    language={match[1]}
+                    PreTag="div"
+                    className={styles.codeBlock}
+                    customStyle={{ margin: 0, background: "none" }}
+                  >
+                    {String(children).replace(/\n$/, "")}
+                  </SyntaxHighlighter>
                 ) : (
                   <code className={styles.codeInline} {...props}>
                     {children}

@@ -13,6 +13,8 @@
   --color-user-bubble-text: #ffffff;
   --color-assistant-bubble: #f4f4f5;
   --color-assistant-bubble-text: #09090b;
+  --color-code-bg: #fafafa;
+  --color-code-text: #383a42;
   --sidebar-width: 260px;
   --radius-sm: 6px;
   --radius-md: 12px;
@@ -34,6 +36,8 @@
   --color-user-bubble-text: #ffffff;
   --color-assistant-bubble: #18181b;
   --color-assistant-bubble-text: #fafafa;
+  --color-code-bg: #282c34;
+  --color-code-text: #abb2bf;
 }
 
 /* ===== ГЛОБАЛЬНЫЙ СБРОС ===== */
