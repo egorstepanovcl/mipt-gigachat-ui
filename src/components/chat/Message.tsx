@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { IconCopy, IconCheck } from "../ui/Icon";
 import ReactMarkdown from "react-markdown";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneLight, oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import type { MessageRole } from "../../types";
@@ -55,6 +58,8 @@ const Message = ({ variant, content, sender, timestamp }: MessageProps) => {
         {/* Контент с Markdown */}
         <div className={styles.content}>
           <ReactMarkdown
+            remarkPlugins={[remarkMath]}
+            rehypePlugins={[rehypeKatex]}
             components={{
               // Блок кода с подсветкой синтаксиса
               code({ className, children, ...props }) {
