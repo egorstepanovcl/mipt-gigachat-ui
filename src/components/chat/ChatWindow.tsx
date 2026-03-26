@@ -2,6 +2,7 @@ import { IconSettings } from "../ui/Icon";
 import MessageList from "./MessageList";
 import { ChatInput } from "./ChatInput";
 import { useChat } from "../../hooks/useChat";
+import { useChatState } from "../../app/providers/ChatProvider";
 import styles from "./ChatWindow.module.css";
 
 interface ChatWindowProps {
@@ -13,7 +14,10 @@ const ChatWindow = ({
   chatTitle = "Как работает React Suspense?",
   onOpenSettings,
 }: ChatWindowProps) => {
+  const { activeChatId } = useChatState();
+
   const { messages, input, setInput, sendMessage, isLoading, stop } = useChat({
+    chatId: activeChatId!,
     api: "/api/chat",
   });
 

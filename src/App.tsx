@@ -1,6 +1,7 @@
 import { useState } from "react";
 import AppLayout from "./components/layout/AppLayout";
 import AuthForm from "./components/auth/AuthForm";
+import { ChatProvider } from "./app/providers/ChatProvider";
 import type { Theme } from "./types";
 import "./styles/theme.css";
 
@@ -22,7 +23,11 @@ function App() {
     return <AuthForm onLogin={handleLogin} />;
   }
 
-  return <AppLayout onToggleTheme={handleToggleTheme} theme={theme} />;
+  return (
+    <ChatProvider>
+      <AppLayout onToggleTheme={handleToggleTheme} theme={theme} />
+    </ChatProvider>
+  );
 }
 
 export default App;

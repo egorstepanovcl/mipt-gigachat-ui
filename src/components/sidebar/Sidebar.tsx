@@ -3,19 +3,21 @@ import { IconPlus, IconClose } from "../ui/Icon";
 import { Button } from "../ui";
 import SearchInput from "./SearchInput";
 import ChatList from "./ChatList";
-import { MOCK_CHATS } from "../../mocks/chats";
-import type { Chat } from "../../types";
+import {
+  useChatState,
+  useChatDispatch,
+} from "../../app/providers/ChatProvider";
 import styles from "./Sidebar.module.css";
 
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  activeId: string | null;
   onSelectChat: (id: string) => void;
 }
 
-const Sidebar = ({ isOpen: _isOpen, onClose, activeId, onSelectChat }: SidebarProps) => {
-  const [chats, setChats] = useState<Chat[]>(MOCK_CHATS);
+const Sidebar = ({ isOpen: _isOpen, onClose, onSelectChat }: SidebarProps) => {
+  const { chats, activeChatId } = useChatState();
+  const dispatch = useChatDispatch();
   const [search, setSearch] = useState("");
 
   const filtered = chats.filter((c) =>
@@ -23,33 +25,31 @@ const Sidebar = ({ isOpen: _isOpen, onClose, activeId, onSelectChat }: SidebarPr
   );
 
   const handleNewChat = () => {
-    const newChat: Chat = {
+    const newChat = {
       id: Date.now().toString(),
       title: "Новый чат",
       messages: [],
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
-    setChats((prev) => [newChat, ...prev]);
+    dispatch({ type: "CREATE_CHAT", payload: newChat });
     onSelectChat(newChat.id);
   };
 
   const handleEdit = (id: string) => {
     const title = prompt("Введите новое название:");
     if (title?.trim()) {
-      setChats((prev) =>
-        prev.map((c) => (c.id === id ? { ...c, title: title.trim() } : c))
-      );
+      dispatch({
+        type: "RENAME_CHAT",
+        payload: { id, title: title.trim() },
+      });
     }
   };
 
   const handleDelete = (id: string) => {
     const confirmed = window.confirm("Удалить этот чат?");
     if (confirmed) {
-      setChats((prev) => prev.filter((c) => c.id !== id));
-      if (activeId === id) {
-        onSelectChat(chats.find((c) => c.id !== id)?.id ?? "");
-      }
+      dispatch({ type: "DELETE_CHAT", payload: id });
     }
   };
 
@@ -77,7 +77,7 @@ const Sidebar = ({ isOpen: _isOpen, onClose, activeId, onSelectChat }: SidebarPr
         <p className={styles.sectionLabel}>Последние чаты</p>
         <ChatList
           chats={filtered}
-          activeChatId={activeId}
+          activeChatId={activeChatId}
           onSelect={onSelectChat}
           onEdit={handleEdit}
           onDelete={handleDelete}

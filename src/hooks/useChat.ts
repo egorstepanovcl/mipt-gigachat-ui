@@ -1,26 +1,29 @@
 import { useState, useRef } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import type { Message } from "../types";
+import {
+  useChatState,
+  useChatDispatch,
+} from "../app/providers/ChatProvider";
 
 function generateId(): string {
   return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
 }
 
 export type UseChatOptions = {
+  chatId: string;
   api?: string;
-  initialMessages?: Message[];
   onFinish?: (message: Message) => void;
   onError?: (error: Error) => void;
 };
 
-export function useChat(options: UseChatOptions = {}) {
-  const [messages, setMessages] = useState<Message[]>(
-    options.initialMessages || []
-  );
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+export function useChat(options: UseChatOptions) {
+  const { messagesByChat, isLoading, error } = useChatState();
+  const dispatch = useChatDispatch();
 
+  const messages = messagesByChat[options.chatId] ?? [];
+
+  const [input, setInput] = useState("");
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const handleInputChange = (
@@ -38,9 +41,13 @@ export function useChat(options: UseChatOptions = {}) {
 
     if (!reader) throw new Error("No reader available");
 
-    setMessages((prev) => [...prev, assistantMessage]);
+    dispatch({
+      type: "ADD_MESSAGE",
+      payload: { chatId: options.chatId, message: assistantMessage },
+    });
 
     let done = false;
+    let accumulated = "";
 
     while (!done) {
       const { value, done: readerDone } = await reader.read();
@@ -60,12 +67,14 @@ export function useChat(options: UseChatOptions = {}) {
               const content = parsed.choices?.[0]?.delta?.content || "";
 
               if (content) {
-                setMessages((prev) => {
-                  const updated = [...prev];
-                  const lastMsg = { ...updated[updated.length - 1] };
-                  lastMsg.content += content;
-                  updated[updated.length - 1] = lastMsg;
-                  return updated;
+                accumulated += content;
+                dispatch({
+                  type: "UPDATE_MESSAGE",
+                  payload: {
+                    chatId: options.chatId,
+                    messageId: assistantMessage.id,
+                    content: accumulated,
+                  },
                 });
               }
             } catch {
@@ -89,10 +98,13 @@ export function useChat(options: UseChatOptions = {}) {
       timestamp: Date.now(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    dispatch({
+      type: "ADD_MESSAGE",
+      payload: { chatId: options.chatId, message: userMessage },
+    });
     setInput("");
-    setIsLoading(true);
-    setError(null);
+    dispatch({ type: "SET_LOADING", payload: true });
+    dispatch({ type: "SET_ERROR", payload: null });
 
     abortControllerRef.current = new AbortController();
 
@@ -121,10 +133,10 @@ export function useChat(options: UseChatOptions = {}) {
     } catch (err) {
       if ((err as Error).name === "AbortError") return;
       const e = err as Error;
-      setError(e);
+      dispatch({ type: "SET_ERROR", payload: e.message });
       options.onError?.(e);
     } finally {
-      setIsLoading(false);
+      dispatch({ type: "SET_LOADING", payload: false });
     }
   };
 
@@ -135,7 +147,7 @@ export function useChat(options: UseChatOptions = {}) {
 
   const stop = () => {
     abortControllerRef.current?.abort();
-    setIsLoading(false);
+    dispatch({ type: "SET_LOADING", payload: false });
   };
 
   const reload = () => {
@@ -143,10 +155,6 @@ export function useChat(options: UseChatOptions = {}) {
       .reverse()
       .find((m) => m.role === "user");
     if (lastUserMessage) {
-      setMessages((prev) => {
-        const idx = prev.findIndex((m) => m.id === lastUserMessage.id);
-        return idx === -1 ? prev : prev.slice(0, idx);
-      });
       sendMessage(lastUserMessage.content);
     }
   };
@@ -162,6 +170,5 @@ export function useChat(options: UseChatOptions = {}) {
     error,
     stop,
     reload,
-    setMessages,
   };
 }
