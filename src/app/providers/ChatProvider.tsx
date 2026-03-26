@@ -1,20 +1,34 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useReducer,
   type Dispatch,
   type ReactNode,
 } from "react";
 import { MOCK_CHATS } from "../../mocks/chats";
 import type { ChatState, ChatAction } from "../../types";
+import { loadState, saveState } from "../../utils/storage";
 
-const initialState: ChatState = {
+const defaultState: ChatState = {
   chats: MOCK_CHATS,
   activeChatId: "1",
   messagesByChat: {},
   isLoading: false,
   error: null,
 };
+
+function getInitialState(): ChatState {
+  const saved = loadState();
+  if (!saved) return defaultState;
+
+  return {
+    ...defaultState,
+    chats: saved.chats ?? defaultState.chats,
+    activeChatId: saved.activeChatId ?? defaultState.activeChatId,
+    messagesByChat: saved.messagesByChat ?? defaultState.messagesByChat,
+  };
+}
 
 function chatReducer(state: ChatState, action: ChatAction): ChatState {
   switch (action.type) {
@@ -99,7 +113,11 @@ const ChatStateContext = createContext<ChatState | null>(null);
 const ChatDispatchContext = createContext<Dispatch<ChatAction> | null>(null);
 
 export function ChatProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(chatReducer, initialState);
+  const [state, dispatch] = useReducer(chatReducer, undefined, getInitialState);
+
+  useEffect(() => {
+    saveState(state);
+  }, [state]);
 
   return (
     <ChatStateContext.Provider value={state}>
