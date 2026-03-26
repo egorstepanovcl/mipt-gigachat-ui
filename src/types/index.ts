@@ -22,6 +22,14 @@ export type Scope =
   | "GIGACHAT_API_B2B"
   | "GIGACHAT_API_CORP";
 
+export interface Settings {
+  model: string;
+  temperature: number;
+  topP: number;
+  maxTokens: number;
+  systemPrompt: string;
+}
+
 export interface ChatState {
   chats: Chat[];
   activeChatId: string | null;

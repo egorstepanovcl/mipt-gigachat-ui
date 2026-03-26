@@ -3,12 +3,14 @@ import { HashRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "./components/layout/AppLayout";
 import AuthForm from "./components/auth/AuthForm";
 import { ChatProvider } from "./app/providers/ChatProvider";
+import { SettingsProvider } from "./app/providers/SettingsProvider";
+import { restoreCredentials } from "./api/gigachat";
 import { IndexRoute, ChatRoute } from "./app/router/routes";
 import type { Theme } from "./types";
 import "./styles/theme.css";
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => restoreCredentials());
   const [theme, setTheme] = useState<Theme>("light");
 
   const handleLogin = () => {
@@ -27,14 +29,16 @@ function App() {
 
   return (
     <HashRouter>
-      <ChatProvider>
-        <Routes>
-          <Route element={<AppLayout onToggleTheme={handleToggleTheme} theme={theme} />}>
-            <Route index element={<IndexRoute />} />
-            <Route path="chat/:id" element={<ChatRoute />} />
-          </Route>
-        </Routes>
-      </ChatProvider>
+      <SettingsProvider>
+        <ChatProvider>
+          <Routes>
+            <Route element={<AppLayout onToggleTheme={handleToggleTheme} theme={theme} />}>
+              <Route index element={<IndexRoute />} />
+              <Route path="chat/:id" element={<ChatRoute />} />
+            </Route>
+          </Routes>
+        </ChatProvider>
+      </SettingsProvider>
     </HashRouter>
   );
 }

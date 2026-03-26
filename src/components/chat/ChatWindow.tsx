@@ -3,6 +3,7 @@ import MessageList from "./MessageList";
 import { ChatInput } from "./ChatInput";
 import { useChat } from "../../hooks/useChat";
 import { useChatState } from "../../app/providers/ChatProvider";
+import { useSettings } from "../../app/providers/SettingsProvider";
 import styles from "./ChatWindow.module.css";
 
 interface ChatWindowProps {
@@ -15,10 +16,11 @@ const ChatWindow = ({
   onOpenSettings,
 }: ChatWindowProps) => {
   const { activeChatId } = useChatState();
+  const { settings } = useSettings();
 
   const { messages, input, setInput, sendMessage, isLoading, stop } = useChat({
     chatId: activeChatId!,
-    api: "/api/chat",
+    settings,
   });
 
   return (

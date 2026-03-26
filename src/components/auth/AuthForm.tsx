@@ -1,5 +1,10 @@
 import { useState } from "react";
 import { Button, ErrorMessage } from "../ui";
+import {
+  authenticate,
+  setCredentials as storeCredentials,
+  setProxyUrls,
+} from "../../api/gigachat";
 import type { Scope } from "../../types";
 import styles from "./AuthForm.module.css";
 
@@ -13,13 +18,16 @@ const SCOPES: { value: Scope; label: string }[] = [
   { value: "GIGACHAT_API_CORP", label: "Corporate" },
 ];
 
+const IS_DEV = import.meta.env.DEV;
+
 const AuthForm = ({ onLogin }: AuthFormProps) => {
   const [credentials, setCredentials] = useState("");
   const [scope, setScope] = useState<Scope>("GIGACHAT_API_PERS");
+  const [proxyUrl, setProxyUrl] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -28,12 +36,26 @@ const AuthForm = ({ onLogin }: AuthFormProps) => {
       return;
     }
 
-    // Имитация запроса — в итоговом задании здесь будет OAuth
+    if (!IS_DEV && !proxyUrl.trim()) {
+      setError("Укажите URL прокси-сервера для работы вне dev-режима");
+      return;
+    }
+
+    if (!IS_DEV && proxyUrl.trim()) {
+      const base = proxyUrl.trim().replace(/\/+$/, "");
+      setProxyUrls(base, base);
+    }
+
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await authenticate(credentials.trim(), scope);
+      storeCredentials(credentials.trim(), scope);
       onLogin();
-    }, 600);
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -67,6 +89,26 @@ const AuthForm = ({ onLogin }: AuthFormProps) => {
               spellCheck={false}
             />
           </div>
+
+          {/* Proxy URL (только в production) */}
+          {!IS_DEV && (
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="proxyUrl">
+                Proxy URL
+                <span className={styles.hint}>(CORS-прокси)</span>
+              </label>
+              <input
+                id="proxyUrl"
+                type="url"
+                className={styles.input}
+                placeholder="https://your-proxy.example.com"
+                value={proxyUrl}
+                onChange={(e) => setProxyUrl(e.target.value)}
+                autoComplete="off"
+                spellCheck={false}
+              />
+            </div>
+          )}
 
           {/* Error */}
           {error && <ErrorMessage message={error} />}

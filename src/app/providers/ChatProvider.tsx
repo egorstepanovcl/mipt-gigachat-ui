@@ -6,13 +6,12 @@ import {
   type Dispatch,
   type ReactNode,
 } from "react";
-import { MOCK_CHATS } from "../../mocks/chats";
 import type { ChatState, ChatAction } from "../../types";
 import { loadState, saveState } from "../../utils/storage";
 
 const defaultState: ChatState = {
-  chats: MOCK_CHATS,
-  activeChatId: "1",
+  chats: [],
+  activeChatId: null,
   messagesByChat: {},
   isLoading: false,
   error: null,

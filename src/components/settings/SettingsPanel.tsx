@@ -1,23 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button, Toggle, Slider } from "../ui";
-import type { Theme } from "../../types";
+import { useSettings } from "../../app/providers/SettingsProvider";
+import type { Theme, Settings } from "../../types";
 import styles from "./SettingsPanel.module.css";
-
-interface Settings {
-  model: string;
-  temperature: number;
-  topP: number;
-  maxTokens: number;
-  systemPrompt: string;
-}
-
-const DEFAULT_SETTINGS: Settings = {
-  model: "GigaChat",
-  temperature: 0.7,
-  topP: 0.9,
-  maxTokens: 1024,
-  systemPrompt: "",
-};
 
 const MODELS = ["GigaChat", "GigaChat-Plus", "GigaChat-Pro", "GigaChat-Max"];
 
@@ -34,14 +19,27 @@ export const SettingsPanel = ({
   theme,
   onToggleTheme,
 }: SettingsPanelProps) => {
-  const [draft, setDraft] = useState<Settings>(DEFAULT_SETTINGS);
+  const { settings, updateSettings, resetSettings } = useSettings();
+  const [draft, setDraft] = useState<Settings>(settings);
+
+  useEffect(() => {
+    if (isOpen) setDraft(settings);
+  }, [isOpen, settings]);
 
   const handleSave = () => {
+    updateSettings(draft);
     onClose();
   };
 
   const handleReset = () => {
-    setDraft(DEFAULT_SETTINGS);
+    resetSettings();
+    setDraft({
+      model: "GigaChat",
+      temperature: 0.7,
+      topP: 0.9,
+      maxTokens: 1024,
+      systemPrompt: "",
+    });
   };
 
   const update = <K extends keyof Settings>(key: K, value: Settings[K]) => {

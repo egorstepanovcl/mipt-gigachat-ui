@@ -1,10 +1,15 @@
 import { useState, useRef } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import type { Message } from "../types";
+import type { Message, Settings } from "../types";
 import {
   useChatState,
   useChatDispatch,
 } from "../app/providers/ChatProvider";
+import {
+  sendChatRequest,
+  type ApiMessage,
+  type ChatRequestOptions,
+} from "../api/gigachat";
 
 function generateId(): string {
   return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
@@ -12,7 +17,7 @@ function generateId(): string {
 
 export type UseChatOptions = {
   chatId: string;
-  api?: string;
+  settings: Settings;
   onFinish?: (message: Message) => void;
   onError?: (error: Error) => void;
 };
@@ -32,6 +37,25 @@ export function useChat(options: UseChatOptions) {
     setInput(e.target.value);
   };
 
+  const buildApiMessages = (msgs: Message[]): ApiMessage[] => {
+    const apiMessages: ApiMessage[] = [];
+
+    if (options.settings.systemPrompt.trim()) {
+      apiMessages.push({
+        role: "system",
+        content: options.settings.systemPrompt.trim(),
+      });
+    }
+
+    for (const m of msgs) {
+      if (m.role === "user" || m.role === "assistant") {
+        apiMessages.push({ role: m.role, content: m.content });
+      }
+    }
+
+    return apiMessages;
+  };
+
   const handleStream = async (
     response: Response,
     assistantMessage: Message
@@ -48,14 +72,16 @@ export function useChat(options: UseChatOptions) {
 
     let done = false;
     let accumulated = "";
+    let buffer = "";
 
     while (!done) {
       const { value, done: readerDone } = await reader.read();
       done = readerDone;
 
       if (value) {
-        const chunk = decoder.decode(value);
-        const lines = chunk.split("\n");
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
 
         for (const line of lines) {
           if (line.startsWith("data: ")) {
@@ -84,6 +110,22 @@ export function useChat(options: UseChatOptions) {
         }
       }
     }
+
+    options.onFinish?.(assistantMessage);
+  };
+
+  const handleNonStreamResponse = async (
+    response: Response,
+    assistantMessage: Message
+  ) => {
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content || "";
+
+    assistantMessage.content = content;
+    dispatch({
+      type: "ADD_MESSAGE",
+      payload: { chatId: options.chatId, message: assistantMessage },
+    });
 
     options.onFinish?.(assistantMessage);
   };
@@ -119,33 +161,48 @@ export function useChat(options: UseChatOptions) {
 
     abortControllerRef.current = new AbortController();
 
+    const apiMessages = buildApiMessages([...messages, userMessage]);
+    const requestOptions: ChatRequestOptions = {
+      model: options.settings.model,
+      temperature: options.settings.temperature,
+      topP: options.settings.topP,
+      maxTokens: options.settings.maxTokens,
+      stream: true,
+    };
+
+    const assistantMessage: Message = {
+      id: generateId(),
+      role: "assistant",
+      content: "",
+      timestamp: Date.now(),
+    };
+
     try {
-      const response = await fetch(options.api || "/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [...messages, userMessage],
-        }),
-        signal: abortControllerRef.current.signal,
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const assistantMessage: Message = {
-        id: generateId(),
-        role: "assistant",
-        content: "",
-        timestamp: Date.now(),
-      };
+      const response = await sendChatRequest(
+        apiMessages,
+        requestOptions,
+        abortControllerRef.current.signal
+      );
 
       await handleStream(response, assistantMessage);
     } catch (err) {
       if ((err as Error).name === "AbortError") return;
-      const e = err as Error;
-      dispatch({ type: "SET_ERROR", payload: e.message });
-      options.onError?.(e);
+
+      // Fallback: попробовать без стриминга
+      try {
+        const fallbackResponse = await sendChatRequest(
+          apiMessages,
+          { ...requestOptions, stream: false },
+          abortControllerRef.current.signal
+        );
+
+        await handleNonStreamResponse(fallbackResponse, assistantMessage);
+      } catch (fallbackErr) {
+        if ((fallbackErr as Error).name === "AbortError") return;
+        const e = fallbackErr as Error;
+        dispatch({ type: "SET_ERROR", payload: e.message });
+        options.onError?.(e);
+      }
     } finally {
       dispatch({ type: "SET_LOADING", payload: false });
     }
