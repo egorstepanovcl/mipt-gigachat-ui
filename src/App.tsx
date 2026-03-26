@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "./components/layout/AppLayout";
 import AuthForm from "./components/auth/AuthForm";
 import { ChatProvider } from "./app/providers/ChatProvider";
+import { IndexRoute, ChatRoute } from "./app/router/routes";
 import type { Theme } from "./types";
 import "./styles/theme.css";
 
@@ -24,9 +26,16 @@ function App() {
   }
 
   return (
-    <ChatProvider>
-      <AppLayout onToggleTheme={handleToggleTheme} theme={theme} />
-    </ChatProvider>
+    <HashRouter>
+      <ChatProvider>
+        <Routes>
+          <Route element={<AppLayout onToggleTheme={handleToggleTheme} theme={theme} />}>
+            <Route index element={<IndexRoute />} />
+            <Route path="chat/:id" element={<ChatRoute />} />
+          </Route>
+        </Routes>
+      </ChatProvider>
+    </HashRouter>
   );
 }
 

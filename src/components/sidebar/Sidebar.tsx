@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { IconPlus, IconClose } from "../ui/Icon";
 import { Button } from "../ui";
 import SearchInput from "./SearchInput";
@@ -18,6 +19,7 @@ interface SidebarProps {
 const Sidebar = ({ isOpen: _isOpen, onClose, onSelectChat }: SidebarProps) => {
   const { chats, activeChatId } = useChatState();
   const dispatch = useChatDispatch();
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
 
   const filtered = chats.filter((c) =>
@@ -33,7 +35,7 @@ const Sidebar = ({ isOpen: _isOpen, onClose, onSelectChat }: SidebarProps) => {
       updatedAt: Date.now(),
     };
     dispatch({ type: "CREATE_CHAT", payload: newChat });
-    onSelectChat(newChat.id);
+    navigate(`/chat/${newChat.id}`);
   };
 
   const handleEdit = (id: string) => {
@@ -49,7 +51,16 @@ const Sidebar = ({ isOpen: _isOpen, onClose, onSelectChat }: SidebarProps) => {
   const handleDelete = (id: string) => {
     const confirmed = window.confirm("Удалить этот чат?");
     if (confirmed) {
+      const wasActive = activeChatId === id;
       dispatch({ type: "DELETE_CHAT", payload: id });
+      if (wasActive) {
+        const remaining = chats.filter((c) => c.id !== id);
+        if (remaining.length > 0) {
+          navigate(`/chat/${remaining[0].id}`);
+        } else {
+          navigate("/");
+        }
+      }
     }
   };
 
