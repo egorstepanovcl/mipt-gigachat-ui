@@ -102,6 +102,17 @@ export function useChat(options: UseChatOptions) {
       type: "ADD_MESSAGE",
       payload: { chatId: options.chatId, message: userMessage },
     });
+
+    if (messages.length === 0 && content.trim().length >= 3) {
+      const trimmed = content.trim();
+      const title =
+        trimmed.length > 40 ? trimmed.slice(0, 40).trimEnd() + "…" : trimmed;
+      dispatch({
+        type: "RENAME_CHAT",
+        payload: { id: options.chatId, title },
+      });
+    }
+
     setInput("");
     dispatch({ type: "SET_LOADING", payload: true });
     dispatch({ type: "SET_ERROR", payload: null });
