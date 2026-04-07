@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { IconPlus, IconClose } from "../ui/Icon";
 import { Button } from "../ui";
@@ -22,11 +22,12 @@ const Sidebar = ({ isOpen: _isOpen, onClose, onSelectChat }: SidebarProps) => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
 
-  const filtered = chats.filter((c) =>
-    c.title.toLowerCase().includes(search.toLowerCase())
+  const filtered = useMemo(
+    () => chats.filter((c) => c.title.toLowerCase().includes(search.toLowerCase())),
+    [chats, search]
   );
 
-  const handleNewChat = () => {
+  const handleNewChat = useCallback(() => {
     const newChat = {
       id: Date.now().toString(),
       title: "Новый чат",
@@ -36,9 +37,9 @@ const Sidebar = ({ isOpen: _isOpen, onClose, onSelectChat }: SidebarProps) => {
     };
     dispatch({ type: "CREATE_CHAT", payload: newChat });
     navigate(`/chat/${newChat.id}`);
-  };
+  }, [dispatch, navigate]);
 
-  const handleEdit = (id: string) => {
+  const handleEdit = useCallback((id: string) => {
     const title = prompt("Введите новое название:");
     if (title?.trim()) {
       dispatch({
@@ -46,9 +47,9 @@ const Sidebar = ({ isOpen: _isOpen, onClose, onSelectChat }: SidebarProps) => {
         payload: { id, title: title.trim() },
       });
     }
-  };
+  }, [dispatch]);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = useCallback((id: string) => {
     const confirmed = window.confirm("Удалить этот чат?");
     if (confirmed) {
       const wasActive = activeChatId === id;
@@ -62,7 +63,7 @@ const Sidebar = ({ isOpen: _isOpen, onClose, onSelectChat }: SidebarProps) => {
         }
       }
     }
-  };
+  }, [activeChatId, chats, dispatch, navigate]);
 
   return (
     <aside className={styles.sidebar}>

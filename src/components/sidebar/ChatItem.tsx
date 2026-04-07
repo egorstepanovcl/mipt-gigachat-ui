@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import { IconChat, IconPencil, IconTrash } from "../ui/Icon";
 import type { Chat } from "../../types";
 import styles from "./ChatItem.module.css";
@@ -24,7 +24,7 @@ const formatDate = (timestamp: number): string => {
   });
 };
 
-const ChatItem = ({ chat, isActive, onSelect, onEdit, onDelete }: ChatItemProps) => {
+const ChatItemComponent = ({ chat, isActive, onSelect, onEdit, onDelete }: ChatItemProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const handleDelete = (e: React.MouseEvent) => {
@@ -80,4 +80,5 @@ const ChatItem = ({ chat, isActive, onSelect, onEdit, onDelete }: ChatItemProps)
   );
 };
 
+const ChatItem = memo(ChatItemComponent);
 export default ChatItem;

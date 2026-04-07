@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import type { Message, Settings } from "../types";
 import {
@@ -31,11 +31,11 @@ export function useChat(options: UseChatOptions) {
   const [input, setInput] = useState("");
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const handleInputChange = (
+  const handleInputChange = useCallback((
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setInput(e.target.value);
-  };
+  }, []);
 
   const buildApiMessages = (msgs: Message[]): ApiMessage[] => {
     const apiMessages: ApiMessage[] = [];
@@ -130,7 +130,7 @@ export function useChat(options: UseChatOptions) {
     options.onFinish?.(assistantMessage);
   };
 
-  const sendMessage = async (content: string) => {
+  const sendMessage = useCallback(async (content: string) => {
     if (!content.trim() || isLoading) return;
 
     const userMessage: Message = {
@@ -206,26 +206,27 @@ export function useChat(options: UseChatOptions) {
     } finally {
       dispatch({ type: "SET_LOADING", payload: false });
     }
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading, messages, options, dispatch]);
 
-  const handleSubmit = async (e?: FormEvent) => {
+  const handleSubmit = useCallback(async (e?: FormEvent) => {
     e?.preventDefault();
     await sendMessage(input);
-  };
+  }, [sendMessage, input]);
 
-  const stop = () => {
+  const stop = useCallback(() => {
     abortControllerRef.current?.abort();
     dispatch({ type: "SET_LOADING", payload: false });
-  };
+  }, [dispatch]);
 
-  const reload = () => {
+  const reload = useCallback(() => {
     const lastUserMessage = [...messages]
       .reverse()
       .find((m) => m.role === "user");
     if (lastUserMessage) {
       sendMessage(lastUserMessage.content);
     }
-  };
+  }, [messages, sendMessage]);
 
   return {
     messages,
