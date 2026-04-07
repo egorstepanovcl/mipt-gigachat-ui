@@ -84,23 +84,25 @@ const Message = ({ variant, content, sender, timestamp }: MessageProps) => {
           </ReactMarkdown>
         </div>
 
-        {/* Футер: время + кнопка копирования */}
+        {/* Футер: время + кнопка копирования (только для ассистента) */}
         <div className={styles.footer}>
           {timestamp && (
             <span className={styles.time}>{formatTime(timestamp)}</span>
           )}
-          <button
-            className={`${styles.copyBtn} ${copied ? styles.copyBtnSuccess : ""} ${isHovered ? styles.copyBtnVisible : ""}`}
-            onClick={handleCopy}
-            aria-label="Копировать"
-            title="Копировать"
-          >
-            {copied ? (
-              <><IconCheck size={13} /> Скопировано</>
-            ) : (
-              <><IconCopy size={13} /> Копировать</>
-            )}
-          </button>
+          {!isUser && (
+            <button
+              className={`${styles.copyBtn} ${copied ? styles.copyBtnSuccess : ""} ${isHovered ? styles.copyBtnVisible : ""}`}
+              onClick={handleCopy}
+              aria-label="Копировать"
+              title="Копировать"
+            >
+              {copied ? (
+                <><IconCheck size={13} /> Скопировано</>
+              ) : (
+                <><IconCopy size={13} /> Копировать</>
+              )}
+            </button>
+          )}
         </div>
       </div>
     </div>
