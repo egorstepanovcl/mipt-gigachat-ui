@@ -45,15 +45,17 @@
   width: 34px;
   height: 34px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
-  background: none;
+  border: 1px solid var(--color-settings-btn-border);
+  background: var(--color-settings-btn-bg);
+  color: var(--color-settings-btn-icon);
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
 .settingsBtn:hover {
   background-color: var(--color-surface-hover);
   color: var(--color-text);
+  border-color: var(--color-text-muted);
 }
 
 /* ── ChatInput ── */

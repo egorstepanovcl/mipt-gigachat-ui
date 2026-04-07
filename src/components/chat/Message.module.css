@@ -21,19 +21,6 @@
   align-self: flex-start;
 }
 
-/* ── Аватар ── */
-.avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
 /* ── Пузырь ── */
 .bubble {
   display: flex;
@@ -123,6 +110,7 @@
 .codeBlock {
   background-color: var(--color-code-bg) !important;
   color: var(--color-code-text);
+  border: 1px solid var(--color-border) !important;
   border-radius: var(--radius-sm) !important;
   padding: 12px 14px !important;
   overflow-x: auto;
@@ -151,7 +139,7 @@
 }
 
 .bubbleUser .link {
-  color: #a5c8ff;
+  color: #ddd6fe;
 }
 
 /* ── Футер ── */

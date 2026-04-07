@@ -22,13 +22,6 @@ const formatTime = (timestamp: number) =>
     minute: "2-digit",
   });
 
-  // Иконка GigaChat для ассистента
-const AssistantAvatar = () => (
-  <div className={styles.avatar} aria-label="GigaChat">
-    <span className={styles.avatarIcon}>✦</span>
-  </div>
-);
-
 const Message = ({ variant, content, sender, timestamp }: MessageProps) => {
   const [copied, setCopied] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -48,10 +41,7 @@ const Message = ({ variant, content, sender, timestamp }: MessageProps) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Аватар ассистента */}
-      {!isUser && <AssistantAvatar />}
-
-      <div className={`${styles.bubble} ${isUser ? styles.bubbleUser : styles.bubbleAssistant}`}>
+<div className={`${styles.bubble} ${isUser ? styles.bubbleUser : styles.bubbleAssistant}`}>
         {/* Имя отправителя */}
         <div className={styles.sender}>{sender}</div>
 
