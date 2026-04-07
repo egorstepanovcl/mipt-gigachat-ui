@@ -1,13 +1,16 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { HashRouter, Routes, Route } from "react-router-dom";
-import AppLayout from "./components/layout/AppLayout";
 import AuthForm from "./components/auth/AuthForm";
 import { ChatProvider } from "./app/providers/ChatProvider";
 import { SettingsProvider } from "./app/providers/SettingsProvider";
 import { restoreCredentials } from "./api/gigachat";
-import { IndexRoute, ChatRoute } from "./app/router/routes";
+import LoadingFallback from "./components/ui/LoadingFallback";
 import type { Theme } from "./types";
 import "./styles/theme.css";
+
+const AppLayout = lazy(() => import("./components/layout/AppLayout"));
+const IndexRoute = lazy(() => import("./app/router/IndexRoute"));
+const ChatRoute = lazy(() => import("./app/router/ChatRoute"));
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => restoreCredentials());
@@ -31,12 +34,22 @@ function App() {
     <HashRouter>
       <SettingsProvider>
         <ChatProvider>
-          <Routes>
-            <Route element={<AppLayout onToggleTheme={handleToggleTheme} theme={theme} />}>
-              <Route index element={<IndexRoute />} />
-              <Route path="chat/:id" element={<ChatRoute />} />
-            </Route>
-          </Routes>
+          <Suspense fallback={<LoadingFallback size="large" />}>
+            <Routes>
+              <Route element={<AppLayout onToggleTheme={handleToggleTheme} theme={theme} />}>
+                <Route index element={
+                  <Suspense fallback={null}>
+                    <IndexRoute />
+                  </Suspense>
+                } />
+                <Route path="chat/:id" element={
+                  <Suspense fallback={null}>
+                    <ChatRoute />
+                  </Suspense>
+                } />
+              </Route>
+            </Routes>
+          </Suspense>
         </ChatProvider>
       </SettingsProvider>
     </HashRouter>

@@ -1,12 +1,16 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import Sidebar from "../sidebar/Sidebar";
 import ChatWindow from "../chat/ChatWindow";
-import { SettingsPanel } from "../settings/SettingsPanel";
 import { EmptyState } from "../chat/EmptyState";
 import { useChatState } from "../../app/providers/ChatProvider";
+import LoadingFallback from "../ui/LoadingFallback";
 import type { Theme } from "../../types";
 import styles from "./AppLayout.module.css";
+
+const Sidebar = lazy(() => import("../sidebar/Sidebar"));
+const SettingsPanel = lazy(() =>
+  import("../settings/SettingsPanel").then((m) => ({ default: m.SettingsPanel }))
+);
 
 interface AppLayoutProps {
   theme: Theme;
@@ -37,11 +41,13 @@ const AppLayout = ({ theme, onToggleTheme }: AppLayoutProps) => {
       />
 
       <aside className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarVisible : ""}`}>
-        <Sidebar
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          onSelectChat={handleSelectChat}
-        />
+        <Suspense fallback={<LoadingFallback />}>
+          <Sidebar
+            isOpen={sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
+            onSelectChat={handleSelectChat}
+          />
+        </Suspense>
       </aside>
 
       <div className={styles.main}>
@@ -66,12 +72,16 @@ const AppLayout = ({ theme, onToggleTheme }: AppLayoutProps) => {
         )}
       </div>
 
-      <SettingsPanel
-        isOpen={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
-        theme={theme}
-        onToggleTheme={onToggleTheme}
-      />
+      {settingsOpen && (
+        <Suspense fallback={<LoadingFallback size="small" />}>
+          <SettingsPanel
+            isOpen={settingsOpen}
+            onClose={() => setSettingsOpen(false)}
+            theme={theme}
+            onToggleTheme={onToggleTheme}
+          />
+        </Suspense>
+      )}
     </div>
   );
 };
