@@ -1,6 +1,8 @@
 import { IconSettings } from "../ui/Icon";
 import MessageList from "./MessageList";
 import { ChatInput } from "./ChatInput";
+import ErrorBoundary from "../ErrorBoundary";
+import { ErrorMessage } from "../ui";
 import { useChat } from "../../hooks/useChat";
 import { useChatState } from "../../app/providers/ChatProvider";
 import { useSettings } from "../../app/providers/SettingsProvider";
@@ -18,7 +20,7 @@ const ChatWindow = ({
   const { activeChatId } = useChatState();
   const { settings } = useSettings();
 
-  const { messages, input, setInput, sendMessage, isLoading, stop } = useChat({
+  const { messages, input, setInput, sendMessage, isLoading, error, stop, reload } = useChat({
     chatId: activeChatId!,
     settings,
   });
@@ -41,9 +43,12 @@ const ChatWindow = ({
         </div>
       </header>
 
-      <MessageList messages={messages} isTyping={isLoading} />
+      <ErrorBoundary>
+        <MessageList messages={messages} isTyping={isLoading} />
+      </ErrorBoundary>
 
       <div className={styles.inputWrapper}>
+        {error && <ErrorMessage message={error} onRetry={reload} />}
         <ChatInput
           value={input}
           onChange={setInput}

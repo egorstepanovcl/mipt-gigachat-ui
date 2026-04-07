@@ -72,16 +72,14 @@ const AppLayout = ({ theme, onToggleTheme }: AppLayoutProps) => {
         )}
       </div>
 
-      {settingsOpen && (
-        <Suspense fallback={<LoadingFallback size="small" />}>
-          <SettingsPanel
-            isOpen={settingsOpen}
-            onClose={() => setSettingsOpen(false)}
-            theme={theme}
-            onToggleTheme={onToggleTheme}
-          />
-        </Suspense>
-      )}
+      <Suspense fallback={null}>
+        <SettingsPanel
+          isOpen={settingsOpen}
+          onClose={() => setSettingsOpen(false)}
+          theme={theme}
+          onToggleTheme={onToggleTheme}
+        />
+      </Suspense>
     </div>
   );
 };

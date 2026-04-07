@@ -15,3 +15,23 @@
   font-size: 14px;
   flex-shrink: 0;
 }
+
+.text {
+  flex: 1;
+}
+
+.retry {
+  flex-shrink: 0;
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.retry:hover {
+  background-color: color-mix(in srgb, var(--color-error) 15%, transparent);
+}
