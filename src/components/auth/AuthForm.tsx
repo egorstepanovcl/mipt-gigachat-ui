@@ -18,6 +18,7 @@ const SCOPES: { value: Scope; label: string }[] = [
   { value: "GIGACHAT_API_CORP", label: "Corporate" },
 ];
 
+// В dev-режиме скрываем поле Proxy URL — Vite сам проксирует запросы
 const IS_DEV = import.meta.env.DEV;
 
 const AuthForm = ({ onLogin }: AuthFormProps) => {

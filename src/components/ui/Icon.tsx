@@ -1,3 +1,4 @@
+// Набор иконок на Unicode-символах без внешних зависимостей
 interface IconProps {
   size?: number;
 }

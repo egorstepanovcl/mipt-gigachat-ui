@@ -1,5 +1,5 @@
 .error {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 6px;
   padding: 8px 12px;
@@ -9,6 +9,7 @@
   color: var(--color-error);
   font-size: 13px;
   width: 100%;
+  max-width: 800px;
 }
 
 .icon {

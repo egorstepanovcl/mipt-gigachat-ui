@@ -9,12 +9,14 @@ export default function ChatRoute() {
 
   const chatExists = chats.some((c) => c.id === id);
 
+  // Синхронизируем activeChatId при прямой навигации по URL
   useEffect(() => {
     if (id && chatExists && activeChatId !== id) {
       dispatch({ type: "SET_ACTIVE_CHAT", payload: id });
     }
   }, [id, chatExists, activeChatId, dispatch]);
 
+  // Чат не найден — перенаправляем на главную
   if (!chatExists) {
     return <Navigate to="/" replace />;
   }

@@ -1,8 +1,9 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 import type { Settings } from "../../types";
 
+// Настройки по умолчанию для новых сессий
 const DEFAULT_SETTINGS: Settings = {
-  model: "GigaChat",
+  model: "GigaChat-Lite",
   temperature: 0.7,
   topP: 0.9,
   maxTokens: 1024,

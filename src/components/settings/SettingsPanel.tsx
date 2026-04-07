@@ -4,7 +4,8 @@ import { useSettings } from "../../app/providers/SettingsProvider";
 import type { Theme, Settings } from "../../types";
 import styles from "./SettingsPanel.module.css";
 
-const MODELS = ["GigaChat", "GigaChat-Plus", "GigaChat-Pro", "GigaChat-Max"];
+// Доступные модели для выбора
+const MODELS = ["GigaChat-Lite", "GigaChat-Pro", "GigaChat-Max"];
 
 interface SettingsPanelProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ export const SettingsPanel = ({
   const { settings, updateSettings, resetSettings } = useSettings();
   const [draft, setDraft] = useState<Settings>(settings);
 
+  // При открытии панели синхронизируем черновик с текущими настройками
   useEffect(() => {
     if (isOpen) setDraft(settings);
   }, [isOpen, settings]);
@@ -34,7 +36,7 @@ export const SettingsPanel = ({
   const handleReset = () => {
     resetSettings();
     setDraft({
-      model: "GigaChat",
+      model: "GigaChat-Lite",
       temperature: 0.7,
       topP: 0.9,
       maxTokens: 1024,

@@ -6,28 +6,54 @@ import {
   type Dispatch,
   type ReactNode,
 } from "react";
-import type { ChatState, ChatAction } from "../../types";
+import type { Chat, ChatState, ChatAction } from "../../types";
 import { loadState, saveState } from "../../utils/storage";
 import { chatReducer, defaultState } from "../../store/chatReducer";
 
-function getInitialState(): ChatState {
-  const saved = loadState();
-  if (!saved) return defaultState;
+function generateId(): string {
+  return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+}
 
+function makeInitialChat(): Chat {
   return {
-    ...defaultState,
-    chats: saved.chats ?? defaultState.chats,
-    activeChatId: saved.activeChatId ?? defaultState.activeChatId,
-    messagesByChat: saved.messagesByChat ?? defaultState.messagesByChat,
+    id: generateId(),
+    title: "Новый чат",
+    messages: [],
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
   };
 }
 
+// Загружаем сохранённое состояние или создаём чат по умолчанию
+function getInitialState(): ChatState {
+  const saved = loadState();
+
+  if (saved?.chats && saved.chats.length > 0) {
+    return {
+      ...defaultState,
+      chats: saved.chats,
+      activeChatId: saved.activeChatId ?? saved.chats[0].id,
+      messagesByChat: saved.messagesByChat ?? {},
+    };
+  }
+
+  const chat = makeInitialChat();
+  return {
+    ...defaultState,
+    chats: [chat],
+    activeChatId: chat.id,
+    messagesByChat: { [chat.id]: [] },
+  };
+}
+
+// Разделяем контексты состояния и dispatch для оптимизации ререндеров
 const ChatStateContext = createContext<ChatState | null>(null);
 const ChatDispatchContext = createContext<Dispatch<ChatAction> | null>(null);
 
 export function ChatProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(chatReducer, undefined, getInitialState);
 
+  // Сохраняем в localStorage при каждом изменении состояния
   useEffect(() => {
     saveState(state);
   }, [state]);

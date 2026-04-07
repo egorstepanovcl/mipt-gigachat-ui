@@ -6,6 +6,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
 }
 
+// Вариант кнопки задаёт CSS-класс из модуля стилей
 const Button = ({ variant = "primary", children, className, ...rest }: ButtonProps) => {
   return (
     <button

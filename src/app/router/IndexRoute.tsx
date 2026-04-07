@@ -4,6 +4,7 @@ import { useChatState } from "../providers/ChatProvider";
 export default function IndexRoute() {
   const { activeChatId, chats } = useChatState();
 
+  // Перенаправляем на активный или первый доступный чат
   if (activeChatId && chats.some((c) => c.id === activeChatId)) {
     return <Navigate to={`/chat/${activeChatId}`} replace />;
   }

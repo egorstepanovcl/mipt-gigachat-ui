@@ -1,5 +1,6 @@
 import type { ChatState, ChatAction } from "../types";
 
+// Начальное пустое состояние
 export const defaultState: ChatState = {
   chats: [],
   activeChatId: null,
@@ -10,6 +11,7 @@ export const defaultState: ChatState = {
 
 export function chatReducer(state: ChatState, action: ChatAction): ChatState {
   switch (action.type) {
+    // Добавляем новый чат в начало списка и активируем его
     case "CREATE_CHAT":
       return {
         ...state,
@@ -29,6 +31,7 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
         ...state,
         chats: filtered,
         messagesByChat: newMessages,
+        // Если удалён активный чат — переключаемся на первый оставшийся
         activeChatId:
           state.activeChatId === action.payload
             ? (filtered[0]?.id ?? null)
@@ -36,6 +39,7 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
       };
     }
 
+    // Обновляем заголовок и метку времени изменения
     case "RENAME_CHAT":
       return {
         ...state,
@@ -61,6 +65,7 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
       };
     }
 
+    // Обновляем контент сообщения на лету (стриминг)
     case "UPDATE_MESSAGE": {
       const { chatId, messageId, content } = action.payload;
       const msgs = state.messagesByChat[chatId];

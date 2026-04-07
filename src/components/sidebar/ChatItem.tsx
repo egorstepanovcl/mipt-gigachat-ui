@@ -9,8 +9,10 @@ interface ChatItemProps {
   onSelect: (id: string) => void;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  snippet?: string;
 }
 
+// Форматируем дату последнего обновления чата в читаемый вид
 const formatDate = (timestamp: number): string => {
   const now = Date.now();
   const diff = now - timestamp;
@@ -24,9 +26,10 @@ const formatDate = (timestamp: number): string => {
   });
 };
 
-const ChatItemComponent = ({ chat, isActive, onSelect, onEdit, onDelete }: ChatItemProps) => {
+const ChatItemComponent = ({ chat, isActive, onSelect, onEdit, onDelete, snippet }: ChatItemProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
+  // Останавливаем всплытие, чтобы не активировать выбор чата
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     onDelete(chat.id);
@@ -52,7 +55,11 @@ const ChatItemComponent = ({ chat, isActive, onSelect, onEdit, onDelete }: ChatI
 
       <div className={styles.content}>
         <span className={styles.title}>{chat.title}</span>
-        <span className={styles.date}>{formatDate(chat.updatedAt)}</span>
+        {snippet ? (
+          <span className={styles.snippet}>{snippet}</span>
+        ) : (
+          <span className={styles.date}>{formatDate(chat.updatedAt)}</span>
+        )}
       </div>
 
       {/* Hover-кнопки */}

@@ -17,15 +17,35 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ isOpen: _isOpen, onClose, onSelectChat }: SidebarProps) => {
-  const { chats, activeChatId } = useChatState();
+  const { chats, activeChatId, messagesByChat } = useChatState();
   const dispatch = useChatDispatch();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
 
-  const filtered = useMemo(
-    () => chats.filter((c) => c.title.toLowerCase().includes(search.toLowerCase())),
-    [chats, search]
-  );
+  // Фильтрация чатов по заголовку и содержимому сообщений с формированием сниппета
+  const filtered = useMemo(() => {
+    if (!search.trim()) return chats.map((c) => ({ ...c, snippet: undefined }));
+    const q = search.toLowerCase();
+    return chats.reduce<(typeof chats[0] & { snippet?: string })[]>((acc, chat) => {
+      if (chat.title.toLowerCase().includes(q)) {
+        acc.push({ ...chat, snippet: undefined });
+        return acc;
+      }
+      const msgs = messagesByChat[chat.id] ?? [];
+      const match = msgs.find((m) => m.content.toLowerCase().includes(q));
+      if (match) {
+        // Вырезаем контекст вокруг найденного слова
+        const idx = match.content.toLowerCase().indexOf(q);
+        const start = Math.max(0, idx - 20);
+        const end = Math.min(match.content.length, idx + q.length + 30);
+        let snippet = match.content.slice(start, end).replace(/\n+/g, " ");
+        if (start > 0) snippet = "…" + snippet;
+        if (end < match.content.length) snippet += "…";
+        acc.push({ ...chat, snippet });
+      }
+      return acc;
+    }, []);
+  }, [chats, messagesByChat, search]);
 
   const handleNewChat = useCallback(() => {
     const newChat = {
@@ -93,6 +113,7 @@ const Sidebar = ({ isOpen: _isOpen, onClose, onSelectChat }: SidebarProps) => {
           onSelect={onSelectChat}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          search={search}
         />
       </div>
     </aside>

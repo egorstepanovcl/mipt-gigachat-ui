@@ -52,12 +52,11 @@ const ChatWindow = ({
         <ChatInput
           value={input}
           onChange={setInput}
-          onSend={sendMessage}
+          onSend={(msg) => sendMessage(msg)}
           onStop={stop}
           disabled={isLoading}
           maxLength={4000}
           onTyping={() => {}}
-          onFilesDrop={(files) => console.log("files:", files)}
         />
       </div>
     </div>

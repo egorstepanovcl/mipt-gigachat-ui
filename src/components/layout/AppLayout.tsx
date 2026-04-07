@@ -7,6 +7,7 @@ import LoadingFallback from "../ui/LoadingFallback";
 import type { Theme } from "../../types";
 import styles from "./AppLayout.module.css";
 
+// Ленивая загрузка боковой панели и настроек
 const Sidebar = lazy(() => import("../sidebar/Sidebar"));
 const SettingsPanel = lazy(() =>
   import("../settings/SettingsPanel").then((m) => ({ default: m.SettingsPanel }))
@@ -26,6 +27,7 @@ const AppLayout = ({ theme, onToggleTheme }: AppLayoutProps) => {
 
   const activeChat = chats.find((c) => c.id === activeChatId);
 
+  // Переходим к выбранному чату и закрываем сайдбар
   const handleSelectChat = (id: string) => {
     navigate(`/chat/${id}`);
     setSidebarOpen(false);
@@ -59,7 +61,7 @@ const AppLayout = ({ theme, onToggleTheme }: AppLayoutProps) => {
           >
             ☰
           </button>
-          <span className={styles.topbarTitle}>GigaChat UI</span>
+          <span className={styles.topbarTitle}>GigaChat</span>
         </header>
 
         {activeChatId ? (

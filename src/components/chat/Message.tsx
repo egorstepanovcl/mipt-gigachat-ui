@@ -16,6 +16,7 @@ interface MessageProps {
   timestamp?: number;
 }
 
+// Форматируем время сообщения в локальный формат ЧЧ:ММ
 const formatTime = (timestamp: number) =>
   new Date(timestamp).toLocaleTimeString("ru-RU", {
     hour: "2-digit",
@@ -30,6 +31,7 @@ const Message = ({ variant, content, sender, timestamp }: MessageProps) => {
   const handleCopy = async () => {
     await navigator.clipboard.writeText(content);
     setCopied(true);
+    // Сбрасываем иконку «скопировано» через 2 секунды
     setTimeout(() => setCopied(false), 2000);
   };
 

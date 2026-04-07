@@ -11,9 +11,11 @@ import {
   type ChatRequestOptions,
 } from "../api/gigachat";
 
+// Генерируем уникальный ID сообщения из случайной части и метки времени
 function generateId(): string {
   return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
 }
+
 
 export type UseChatOptions = {
   chatId: string;
@@ -37,6 +39,7 @@ export function useChat(options: UseChatOptions) {
     setInput(e.target.value);
   }, []);
 
+  // Формируем массив сообщений для API, добавляя системный промпт первым
   const buildApiMessages = (msgs: Message[]): ApiMessage[] => {
     const apiMessages: ApiMessage[] = [];
 
@@ -56,6 +59,7 @@ export function useChat(options: UseChatOptions) {
     return apiMessages;
   };
 
+  // Читаем SSE-поток и обновляем сообщение ассистента по мере поступления чанков
   const handleStream = async (
     response: Response,
     assistantMessage: Message
@@ -131,7 +135,8 @@ export function useChat(options: UseChatOptions) {
   };
 
   const sendMessage = useCallback(async (content: string) => {
-    if (!content.trim() || isLoading) return;
+    if (!content.trim()) return;
+    if (isLoading) return;
 
     const userMessage: Message = {
       id: generateId(),
@@ -145,6 +150,7 @@ export function useChat(options: UseChatOptions) {
       payload: { chatId: options.chatId, message: userMessage },
     });
 
+    // Автозаголовок чата из первого сообщения пользователя
     if (messages.length === 0 && content.trim().length >= 3) {
       const trimmed = content.trim();
       const title =
@@ -162,6 +168,7 @@ export function useChat(options: UseChatOptions) {
     abortControllerRef.current = new AbortController();
 
     const apiMessages = buildApiMessages([...messages, userMessage]);
+
     const requestOptions: ChatRequestOptions = {
       model: options.settings.model,
       temperature: options.settings.temperature,
@@ -214,11 +221,13 @@ export function useChat(options: UseChatOptions) {
     await sendMessage(input);
   }, [sendMessage, input]);
 
+  // Отменяем текущий запрос через AbortController
   const stop = useCallback(() => {
     abortControllerRef.current?.abort();
     dispatch({ type: "SET_LOADING", payload: false });
   }, [dispatch]);
 
+  // Повторяем последнее сообщение пользователя
   const reload = useCallback(() => {
     const lastUserMessage = [...messages]
       .reverse()

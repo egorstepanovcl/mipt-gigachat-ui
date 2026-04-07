@@ -62,6 +62,15 @@
   color: var(--color-text-muted);
 }
 
+.snippet {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-style: italic;
+}
+
 /* ── Hover-кнопки ── */
 .actions {
   display: flex;

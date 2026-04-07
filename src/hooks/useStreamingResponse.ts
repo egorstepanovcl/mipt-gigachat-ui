@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 
+// Универсальный хук для чтения HTTP-стримов и SSE
 export type UseStreamingResponseOptions = {
   url: string;
   enabled?: boolean;
@@ -12,6 +13,7 @@ export type UseStreamingResponseOptions = {
   parseChunk?: (rawChunk: Uint8Array) => string;
 };
 
+// Метрики стриминга для отладки
 type Metadata = {
   startTime: number | null;
   endTime: number | null;
@@ -178,11 +180,13 @@ export function useStreamingResponse(options: UseStreamingResponseOptions) {
     } as AbortController;
   };
 
+  // Прерываем активный стрим
   const abort = useCallback(() => {
     abortControllerRef.current?.abort();
     setIsStreaming(false);
   }, []);
 
+  // Сбрасываем состояние в начальное
   const reset = useCallback(() => {
     setData("");
     setStreamedChunks([]);

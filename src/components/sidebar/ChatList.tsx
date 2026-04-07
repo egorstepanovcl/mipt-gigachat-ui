@@ -2,12 +2,15 @@ import type { Chat } from "../../types";
 import ChatItem from "./ChatItem";
 import styles from "./ChatList.module.css";
 
+type ChatWithSnippet = Chat & { snippet?: string };
+
 interface ChatListProps {
-  chats: Chat[];
+  chats: ChatWithSnippet[];
   activeChatId: string | null;
   onSelect: (id: string) => void;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  search?: string;
 }
 
 const ChatList = ({ chats, activeChatId, onSelect, onEdit, onDelete }: ChatListProps) => {
@@ -29,6 +32,7 @@ const ChatList = ({ chats, activeChatId, onSelect, onEdit, onDelete }: ChatListP
           onSelect={onSelect}
           onEdit={onEdit}
           onDelete={onDelete}
+          snippet={chat.snippet}
         />
       ))}
     </div>

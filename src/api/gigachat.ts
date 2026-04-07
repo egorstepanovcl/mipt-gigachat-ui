@@ -1,5 +1,6 @@
 import type { Scope } from "../types";
 
+// Ключ для сохранения учётных данных в sessionStorage
 const AUTH_STORAGE_KEY = "gigachat-auth";
 
 interface TokenData {
@@ -12,18 +13,21 @@ interface StoredAuth {
   scope: Scope;
 }
 
+// Кэш токена и учётных данных в памяти
 let tokenData: TokenData | null = null;
 let storedCredentials: string | null = null;
 let storedScope: Scope | null = null;
 let apiBaseUrl = "";
 let authBaseUrl = "";
 
+// Обновляем токен за минуту до истечения
 const TOKEN_REFRESH_BUFFER_MS = 60_000;
 
 function isDevMode(): boolean {
   return import.meta.env.DEV;
 }
 
+// В dev-режиме используем Vite-прокси вместо прямых URL
 function getAuthUrl(): string {
   if (isDevMode()) return "/auth/api/v2/oauth";
   return `${authBaseUrl}/api/v2/oauth`;
@@ -43,6 +47,7 @@ export function getProxyUrls() {
   return { apiBaseUrl, authBaseUrl };
 }
 
+// Сохраняем учётные данные между перезагрузками страницы
 function persistAuth(credentials: string, scope: Scope) {
   try {
     const data: StoredAuth = { credentials, scope };
@@ -66,6 +71,7 @@ function clearPersistedAuth() {
   } catch {}
 }
 
+// Восстанавливаем сессию при старте приложения
 export function restoreCredentials(): boolean {
   const saved = loadPersistedAuth();
   if (!saved) return false;
@@ -124,6 +130,7 @@ export async function authenticate(
   return td;
 }
 
+// Возвращает действующий токен, при необходимости обновляя его
 export async function getValidToken(): Promise<string> {
   if (
     tokenData &&
@@ -151,6 +158,40 @@ export interface ChatRequestOptions {
 export interface ApiMessage {
   role: "system" | "user" | "assistant";
   content: string;
+  attachments?: string[];
+}
+
+// Загружаем файл и возвращаем его ID для вложений
+export async function uploadFile(file: File): Promise<string> {
+  const token = await getValidToken();
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("purpose", "general");
+
+  const response = await fetch(getApiUrl("/files"), {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => "");
+    throw new Error(`Ошибка загрузки файла (${response.status}): ${text || response.statusText}`);
+  }
+
+  const data = await response.json();
+  return data.id as string;
+}
+
+// Маппинг UI-названий на реальные идентификаторы моделей API
+const MODEL_API_NAME: Record<string, string> = {
+  "GigaChat-Lite": "GigaChat",
+};
+
+function resolveModelName(model: string): string {
+  return MODEL_API_NAME[model] ?? model;
 }
 
 export async function sendChatRequest(
@@ -167,7 +208,7 @@ export async function sendChatRequest(
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
-      model: options.model,
+      model: resolveModelName(options.model),
       messages,
       stream: options.stream,
       temperature: options.temperature,

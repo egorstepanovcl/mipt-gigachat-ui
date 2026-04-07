@@ -12,6 +12,7 @@ interface State {
   error: Error | null;
 }
 
+// Перехватывает ошибки рендеринга дочерних компонентов
 class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
@@ -26,6 +27,7 @@ class ErrorBoundary extends Component<Props, State> {
     console.error("ErrorBoundary caught an error:", error, info.componentStack);
   }
 
+  // Сбрасываем ошибку для повторной попытки
   handleRetry = () => {
     this.setState({ hasError: false, error: null });
   };

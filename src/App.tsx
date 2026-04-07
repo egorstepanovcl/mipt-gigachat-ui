@@ -8,11 +8,13 @@ import LoadingFallback from "./components/ui/LoadingFallback";
 import type { Theme } from "./types";
 import "./styles/theme.css";
 
+// Ленивая загрузка крупных компонентов
 const AppLayout = lazy(() => import("./components/layout/AppLayout"));
 const IndexRoute = lazy(() => import("./app/router/IndexRoute"));
 const ChatRoute = lazy(() => import("./app/router/ChatRoute"));
 
 function App() {
+  // Восстанавливаем сессию из sessionStorage при старте
   const [isAuthenticated, setIsAuthenticated] = useState(() => restoreCredentials());
   const [theme, setTheme] = useState<Theme>("light");
 
@@ -23,9 +25,11 @@ function App() {
   const handleToggleTheme = () => {
     const next = theme === "light" ? "dark" : "light";
     setTheme(next);
+    // Применяем тему через data-атрибут на корневом элементе
     document.documentElement.setAttribute("data-theme", next);
   };
 
+  // Пока не авторизованы — показываем форму входа
   if (!isAuthenticated) {
     return <AuthForm onLogin={handleLogin} />;
   }

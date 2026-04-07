@@ -10,6 +10,7 @@ interface SliderProps {
 }
 
 const Slider = ({ min, max, step = 0.1, value, onChange, label }: SliderProps) => {
+  // Вычисляем позицию ползунка для кастомной заливки через CSS-переменную
   const percent = ((value - min) / (max - min)) * 100;
 
   return (

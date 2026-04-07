@@ -1,6 +1,6 @@
-import { useRef, useState, useEffect } from "react";
-import type { KeyboardEvent, DragEvent } from "react";
-import { IconSend, IconStop, IconPaperclip } from "../ui/Icon";
+import { useRef, useEffect } from "react";
+import type { KeyboardEvent } from "react";
+import { IconSend, IconStop } from "../ui/Icon";
 import styles from "./ChatInput.module.css";
 
 type ChatInputProps = {
@@ -13,7 +13,6 @@ type ChatInputProps = {
   maxRows?: number;
   maxLength?: number;
   onTyping?: () => void;
-  onFilesDrop?: (files: FileList) => void;
 };
 
 export const ChatInput = ({
@@ -26,11 +25,10 @@ export const ChatInput = ({
   maxRows = 8,
   maxLength = 4000,
   onTyping,
-  onFilesDrop,
 }: ChatInputProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
 
+  // Динамически подстраиваем высоту textarea под содержимое
   const adjustHeight = () => {
     const el = textareaRef.current;
     if (!el) return;
@@ -58,11 +56,13 @@ export const ChatInput = ({
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    // Enter — отправить, Shift+Enter — перенос строки
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
       return;
     }
+    // Ctrl/Cmd+K — очистить поле
     if (e.key === "k" && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
       onChange("");
@@ -74,45 +74,14 @@ export const ChatInput = ({
     }
   };
 
-  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (e.dataTransfer.files.length > 0) {
-      onFilesDrop?.(e.dataTransfer.files);
-    }
-  };
-
   const isEmpty = value.trim().length === 0;
   const charsLeft = maxLength ? maxLength - value.length : null;
+  // Показываем счётчик только когда использовано >80% лимита
   const showCounter = maxLength && value.length > maxLength * 0.8;
 
   return (
-    <div
-      className={`${styles.outer} ${isDragging ? styles.dragging : ""}`}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-    >
+    <div className={styles.outer}>
       <div className={styles.wrapper}>
-        <button
-          className={styles.attach}
-          type="button"
-          title="Прикрепить файл"
-          tabIndex={-1}
-        >
-          <IconPaperclip size={18} />
-        </button>
-
         <textarea
           ref={textareaRef}
           className={styles.textarea}
