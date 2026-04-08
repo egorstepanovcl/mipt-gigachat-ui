@@ -9,9 +9,6 @@ const TypingIndicator = ({ isVisible = true }: TypingIndicatorProps) => {
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.avatar}>
-        <span className={styles.avatarIcon}>✦</span>
-      </div>
       <div className={styles.bubble}>
         <span className={styles.dot} />
         <span className={styles.dot} />

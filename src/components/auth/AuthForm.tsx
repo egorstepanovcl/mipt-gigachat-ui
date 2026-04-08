@@ -38,7 +38,7 @@ const AuthForm = ({ onLogin }: AuthFormProps) => {
     }
 
     if (!IS_DEV && !proxyUrl.trim()) {
-      setError("Укажите URL прокси-сервера для работы вне dev-режима");
+      setError("Укажите URL прокси-сервера для работы");
       return;
     }
 
